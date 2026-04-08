@@ -1,3 +1,16 @@
+---
+title: Doc Sweeper Environment
+emoji: 🧹
+colorFrom: 'blue'
+colorTo: 'green'
+sdk: docker
+pinned: false
+app_port: 8000
+tags:
+  - openenv
+---
+
+
 # Doc Sweeper Environment
 
 A virtual file system and text-editing environment for OpenEnv. This environment tasks autonomous LLM agents with acting as automated documentation engineers, requiring them to navigate a directory tree, read files, and apply precise string manipulations to complete complex refactoring tasks.
