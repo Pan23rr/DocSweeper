@@ -4,13 +4,6 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-"""
-Doc Sweeper Environment for OpenEnv.
-
-This module provides an environment where an agent navigates a virtual file system
-to fix outdated documentation, broken links, and deprecated configurations.
-"""
-
 import uuid
 from typing import Dict, List
 
@@ -20,12 +13,6 @@ from models import DocAction, DocObservation, DocState
 
 
 class DocSweeperEnvironment(Environment):
-    """
-    Doc Sweeper environment implementing the OpenEnv interface.
-
-    Simulates a Virtual File System (VFS) of markdown and config files. The agent
-    must find and replace deprecated patterns without destructive behavior.
-    """
 
     def __init__(
         self,
@@ -33,8 +20,6 @@ class DocSweeperEnvironment(Environment):
         max_steps: int = 30,
     ):
         """
-        Initialize the Doc Sweeper environment.
-
         Args:
             task: Task to run - "version_bump", "config_migration", or "broken_links".
             max_steps: Maximum allowed actions before forced termination.
@@ -48,8 +33,6 @@ class DocSweeperEnvironment(Environment):
 
     def reset(self, **kwargs):
         """
-        Initialize a new task episode.
-
         Returns:
             Initial observation of the virtual file system.
         """
@@ -86,13 +69,8 @@ class DocSweeperEnvironment(Environment):
 
     def step(self, action: DocAction):
         """
-        Execute an action and return the resulting state.
-
         Args:
             action: The tool action to execute (open, edit, grep, done).
-
-        Returns:
-            Observation with reward and done flag.
         """
         if self._state is None:
             raise RuntimeError("Environment not initialized. Call reset() first.")
@@ -159,7 +137,6 @@ class DocSweeperEnvironment(Environment):
             return -0.1
 
     def _evaluate_final_grade(self) -> float:
-        # Simplified deterministic grader for example purposes
         text = "".join(self._state.vfs.values())
         if self._task == "version_bump":
             target_count = text.count("v2.0.0")
@@ -189,5 +166,4 @@ class DocSweeperEnvironment(Environment):
 
     @property
     def state(self):
-        """Return the current episode state."""
         return self._state

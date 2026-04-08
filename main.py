@@ -1,5 +1,5 @@
 def main():
-    print("Hello from cust-env!")
+    print("Hello from DocSweeper!")
 
 
 if __name__ == "__main__":

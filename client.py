@@ -4,12 +4,6 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-"""
-Doc Sweeper Environment Client.
-
-This module provides the client for connecting to a Doc Sweeper Environment server
-via WebSocket for persistent sessions.
-"""
 
 from __future__ import annotations
 
@@ -22,30 +16,12 @@ from models import DocAction, DocObservation, DocState
 
 
 class DocSweeperEnv(EnvClient[DocAction, DocObservation, DocState]):
-    """
-    Client for Doc Sweeper Environment.
-
-    This client maintains a persistent WebSocket connection to the environment
-    server, enabling efficient multi-step interactions with lower latency.
-
-    Example:
-        >>> with DocSweeperEnv(base_url="http://localhost:8000") as client:
-        ...     result = client.reset()
-        ...     print(result.observation.terminal_feedback)
-        ...
-        ...     result = client.step(DocAction(tool_name="open", path="/docs/setup.md"))
-        ...     print(result.observation.file_content)
-    """
 
     def _step_payload(self, action: DocAction) -> Dict[str, Any]:
         """
-        Convert DocAction to JSON payload for step request.
 
         Args:
             action: DocAction instance with tool parameters.
-
-        Returns:
-            Dictionary representation suitable for JSON encoding.
         """
         return {
             "tool_name": action.tool_name,
@@ -57,13 +33,9 @@ class DocSweeperEnv(EnvClient[DocAction, DocObservation, DocState]):
 
     def _parse_result(self, payload: Dict[str, Any]) -> StepResult[DocObservation]:
         """
-        Parse server response into StepResult[DocObservation].
-
         Args:
             payload: JSON response from server.
 
-        Returns:
-            StepResult with DocObservation.
         """
         obs_data = payload.get("observation", {})
 
@@ -85,13 +57,9 @@ class DocSweeperEnv(EnvClient[DocAction, DocObservation, DocState]):
 
     def _parse_state(self, payload: Dict[str, Any]) -> DocState:
         """
-        Parse server response into DocState object.
-
         Args:
             payload: JSON response from /state endpoint.
 
-        Returns:
-            DocState object with environment state information.
         """
         return DocState(
             episode_id=payload.get("episode_id", ""),

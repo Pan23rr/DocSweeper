@@ -4,13 +4,6 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-"""
-Data models for Doc Sweeper Environment.
-
-This module defines the Action, Observation, and State types for the documentation
-maintenance tasks via the OpenEnv interface.
-"""
-
 from __future__ import annotations
 
 from typing import Dict, List, Optional
@@ -21,8 +14,6 @@ from pydantic import Field
 
 class DocAction(Action):
     """
-    Action for Doc Sweeper environment.
-
     Attributes:
         tool_name: The command to run ('open', 'edit', 'grep', 'done').
         path: File path for opening or editing.
@@ -40,7 +31,6 @@ class DocAction(Action):
 
 class DocObservation(Observation):
     """
-    Observation for Doc Sweeper environment.
 
     Attributes:
         active_file: Currently opened file path.
@@ -62,8 +52,6 @@ class DocObservation(Observation):
 
 class DocState(State):
     """
-    State for Doc Sweeper environment.
-
     Attributes:
         episode_id: Unique ID for the current task session.
         step_count: Number of actions taken.

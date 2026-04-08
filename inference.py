@@ -1,5 +1,3 @@
-"""Inference script for the Doc Sweeper Environment."""
-
 import os
 import json
 import time
