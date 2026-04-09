@@ -72,16 +72,13 @@ class DocSweeperEnvironment(Environment):
         done = False
         self._terminal_feedback = ""
         
-        # 1. Calculate the score BEFORE the action
         old_score = self._calculate_state_score()
         
-        # 2. Execute the action and track any direct penalties (syntax errors, bad paths)
         step_penalty = 0.0
 
         if action.tool_name == "done":
             done = True
             self._terminal_feedback = "Task submitted. Evaluating final state."
-            # No direct penalty or bonus here, the final delta will handle it
             
         elif action.tool_name == "open":
             if action.path in self._state.vfs:
@@ -89,7 +86,7 @@ class DocSweeperEnvironment(Environment):
                 self._terminal_feedback = f"Opened {action.path}"
             else:
                 self._terminal_feedback = f"Error: File '{action.path}' not found."
-                step_penalty -= 0.05 # Small penalty for hallucinating files
+                step_penalty -= 0.05 
                 
         elif action.tool_name == "grep":
             if action.search_query:
