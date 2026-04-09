@@ -8,7 +8,6 @@ from models import DocAction
 IMAGE_NAME = os.getenv("IMAGE_NAME") 
 API_KEY = os.getenv("HF_TOKEN") or os.getenv("API_KEY")
 
-# Swapped back to OpenAI defaults
 API_BASE_URL = os.getenv("API_BASE_URL") or "https://api.openai.com/v1"
 MODEL_NAME = os.getenv("MODEL_NAME") or "gpt-4o-mini"
 BENCHMARK_NAME = "doc_sweeper"
@@ -25,12 +24,11 @@ def run_inference(task_name: str):
     if not hf_token:
         raise ValueError("Missing hf_token")
 
-    # Replaced Groq with OpenAI, keeping the timeout fixes!
     client = OpenAI(
         api_key=hf_token,
         base_url=api_base_url,
-        timeout=15.0,     # Max 15 seconds per request
-        max_retries=1     # Do not get stuck in infinite backoff loops
+        timeout=15.0,    
+        max_retries=1 
     )
     
     env = DocSweeperEnvironment(task=task_name)
@@ -40,7 +38,7 @@ def run_inference(task_name: str):
     total_reward = 0.0
     step_count = 0
     rewards_history = []
-    MAX_STEPS = 20 # Hard step limit failsafe
+    MAX_STEPS = 20 
 
     print(f"[START] task={task_name} env={BENCHMARK_NAME} model={model_name}", flush=True)
 
