@@ -5,21 +5,20 @@ from openai import OpenAI
 from server.cust_env_environment import DocSweeperEnvironment
 from models import DocAction
 
-
 IMAGE_NAME = os.getenv("IMAGE_NAME") 
 API_KEY = os.getenv("HF_TOKEN") or os.getenv("API_KEY")
 
 API_BASE_URL = os.getenv("API_BASE_URL") or "https://api.openai.com/v1"
 MODEL_NAME = os.getenv("MODEL_NAME") or "gpt-4o-mini"
+BENCHMARK_NAME = "doc_sweeper"
 
 def run_inference(task_name: str):
-
     api_base_url = os.environ.get("API_BASE_URL") or API_BASE_URL
     model_name = os.environ.get("MODEL_NAME") or MODEL_NAME
     hf_token = os.environ.get("HF_TOKEN") or API_KEY
 
     if not api_base_url:
-        raise ValueError("Missinh api base url")
+        raise ValueError("Missing API base url")
     if not model_name:
         raise ValueError("Missing model name")
     if not hf_token:
@@ -32,12 +31,13 @@ def run_inference(task_name: str):
     
     env = DocSweeperEnvironment(task=task_name)
     obs = env.reset()
+    
     done = False
     total_reward = 0.0
     step_count = 0
-    
+    rewards_history = []
 
-    print(f"[START] task={task_name} model={model_name}")
+    print(f"[START] task={task_name} env={BENCHMARK_NAME} model={model_name}", flush=True)
 
     system_prompt = f"""
     You are an elite, systematic documentation engineer. You interact with a virtual file system via JSON tool calls.
@@ -102,22 +102,29 @@ def run_inference(task_name: str):
             
             action = DocAction(**safe_kwargs)
             obs = env.step(action)
+            
             total_reward += obs.reward
+            rewards_history.append(obs.reward)
             done = obs.done
 
-
-            print(f"[STEP] step={step_count} action={action.tool_name} reward={obs.reward:.2f} done={done} thought=\"{thought[:100]}...\"")
+            action_str = f"{action.tool_name}" 
+            done_str = str(done).lower()
+            print(f"[STEP] step={step_count} action={action_str} reward={obs.reward:.2f} done={done_str} error=null", flush=True)
             
         except Exception as e:
-            obs.terminal_feedback = f"SYSTEM ERROR: {str(e)}. Review the schema rules."
-            print(f"[STEP] step={step_count} action=error reward=0.0 done={done} error=\"{str(e)}\"")
-
-    runtime = time.time() - start_time
-
+            error_msg = str(e).replace('\n', ' ')
+            obs.terminal_feedback = f"SYSTEM ERROR: {error_msg}. Review the schema rules."
+            rewards_history.append(0.0) 
+            
+            done_str = str(done).lower()
+            print(f"[STEP] step={step_count} action=error reward=0.00 done={done_str} error=\"{error_msg}\"", flush=True)
 
     final_score = max(0.0, min(1.0, total_reward))
-    
-    print(f"[END] task={task_name} score={final_score:.2f} total_steps={step_count} runtime_seconds={runtime:.1f}")
+    success = final_score > 0.0 # Define what success means for your environment
+    success_str = str(success).lower()
+    rewards_str = ",".join(f"{r:.2f}" for r in rewards_history)
+
+    print(f"[END] success={success_str} steps={step_count} score={final_score:.2f} rewards={rewards_str}", flush=True)
 
 
 if __name__ == "__main__":
