@@ -62,7 +62,8 @@ class DocSweeperEnvironment(Environment):
             active_file=""
         )
 
-        return self._make_observation(reward=0.0, done=False)
+        # Baseline reward is exactly 0.5 (neutral)
+        return self._make_observation(reward=0.5, done=False)
 
     def step(self, action: DocAction):
         if self._state is None:
@@ -109,10 +110,19 @@ class DocSweeperEnvironment(Environment):
 
         new_score = self._calculate_state_score()
         
+        # Calculate raw delta reward
         delta_reward = (new_score - old_score)
-        total_step_reward = delta_reward + step_penalty
+        raw_step_reward = delta_reward + step_penalty
+        
+        # Map reward to be strictly within (0.0, 1.0)
+        # raw_step_reward ranges roughly from -1.0 to 1.0. We map it so 0.0 raw = 0.5 mapped.
+        mapped_reward = (raw_step_reward + 1.0) / 2.0
+        
+        # Clamp strictly to (0.0, 1.0) boundaries using a 0.01 epsilon
+        EPSILON = 0.01
+        final_reward = max(EPSILON, min(1.0 - EPSILON, mapped_reward))
             
-        return self._make_observation(reward=total_step_reward, done=done)
+        return self._make_observation(reward=final_reward, done=done)
 
     def _handle_edit(self, action: DocAction) -> float:
         """Executes the edit and returns a penalty if it fails."""
