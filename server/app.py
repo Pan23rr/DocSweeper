@@ -10,8 +10,6 @@ import uvicorn
 from models import DocAction, DocObservation
 from .cust_env_environment import DocSweeperEnvironment
 
-# Create the FastAPI app
-# Pass the class (factory) instead of an instance for WebSocket session support
 app = create_app(DocSweeperEnvironment, DocAction, DocObservation, env_name="doc_sweeper")
 
 def main():

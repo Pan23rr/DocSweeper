@@ -5,15 +5,27 @@ from openai import OpenAI
 from server.cust_env_environment import DocSweeperEnvironment
 from models import DocAction
 
+
+IMAGE_NAME = os.getenv("IMAGE_NAME") 
+API_KEY = os.getenv("HF_TOKEN") or os.getenv("API_KEY")
+
+API_BASE_URL = os.getenv("API_BASE_URL") or "https://router.huggingface.co/v1"
+MODEL_NAME = os.getenv("MODEL_NAME") or "Qwen/Qwen2.5-72B-Instruct"
+TASK_NAME = os.getenv("MY_ENV_V4_TASK", "echo")
+BENCHMARK = os.getenv("MY_ENV_V4_BENCHMARK", "my_env_v4")
+
 def run_inference(task_name: str):
 
-    api_base_url = os.environ.get("API_BASE_URL")
-    model_name = os.environ.get("MODEL_NAME")
-    hf_token = os.environ.get("HF_TOKEN")
+    api_base_url = os.environ.get("API_BASE_URL") or API_BASE_URL
+    model_name = os.environ.get("MODEL_NAME") or MODEL_NAME
+    hf_token = os.environ.get("HF_TOKEN") or API_KEY
 
-    if not all([api_base_url, model_name, hf_token]):
-        raise ValueError("Missing required environment variables: API_BASE_URL, MODEL_NAME, or HF_TOKEN")
-
+    if not api_base_url:
+        raise ValueError("Missinh api base url")
+    if not model_name:
+        raise ValueError("Missing model name")
+    if not hf_token:
+        raise ValueError("Missing hf_token")
 
     client = OpenAI(
         api_key=hf_token,
