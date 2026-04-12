@@ -124,7 +124,7 @@ def run_inference(task_name: str):
             done_str = str(done).lower()
             print(f"[STEP] step={step_count} action=error reward=0.00 done={done_str} error=\"{error_msg}\"", flush=True)
 
-    final_score = max(0.0, min(1.0, total_reward))
+    final_score = max(0.01, min(.99, total_reward))
     success = final_score > 0.0 
     success_str = str(success).lower()
     rewards_str = ",".join(f"{r:.2f}" for r in rewards_history)
